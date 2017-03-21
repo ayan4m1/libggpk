@@ -97,18 +97,15 @@ namespace LibGGPK
                     RecordOffsets.Add(currentOffset, record);
 
                     var percentComplete = currentOffset / (float)streamLength;
-                    if (percentComplete - previousPercentComplete >= 0.10f)
-                    {
-                        if (output != null)
-                            output(String.Format("\t{0:00.00}%{1}", 100.0 * percentComplete, Environment.NewLine));
-                        previousPercentComplete = percentComplete;
-                    }
+                    if (!(percentComplete - previousPercentComplete >= 0.10f)) continue;
+                    output?.Invoke($"\t{100.0*percentComplete:00.00}%{Environment.NewLine}");
+                    previousPercentComplete = percentComplete;
                 }
-                if (output != null)
-                {
-                    var percentReady = 100.0f * br.BaseStream.Position / br.BaseStream.Length;
-                    output(String.Format("\t{0:00.00}%{1}", percentReady, Environment.NewLine));
-                }
+
+                if (output == null) return;
+
+                var percentReady = 100.0f * br.BaseStream.Position / br.BaseStream.Length;
+                output($"\t{percentReady:00.00}%{Environment.NewLine}");
             }
         }
 
@@ -155,9 +152,9 @@ namespace LibGGPK
         private void CreateDirectoryTree(Action<string> output)
         {
             DirectoryRoot = BuildDirectoryTree();
-            output(String.Format("Found {0} directories and {1} files", _directories.Count, _files.Count) + Environment.NewLine);
+            output($"Found {_directories.Count} directories and {_files.Count} files" + Environment.NewLine);
             FreeRoot = BuildFreeList();
-            output(String.Format("Found {0} FREE records", _freeRecords.Count) + Environment.NewLine);
+            output($"Found {_freeRecords.Count} FREE records" + Environment.NewLine);
         }
 
         #endregion
@@ -365,9 +362,7 @@ namespace LibGGPK
         public void DeleteDirectoryRecord(DirectoryTreeNode dir)
         {
             var parent = dir.Parent;
-            if (parent == null) // root directory
-                return;
-            parent.RemoveDirectory(dir);
+            parent?.RemoveDirectory(dir);
         }
     }
 }
