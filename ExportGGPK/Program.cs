@@ -13,8 +13,9 @@ namespace ExportGGPK
         private static readonly Dictionary<string, List<FileRecord>> Data = new Dictionary<string, List<FileRecord>>();
         private static readonly char[] PathSeperator = { Path.DirectorySeparatorChar };
 
-        private static string contentPath;
-        private static string outputPath;
+        private static string contentPath = string.Empty;
+        private static string outputPath = string.Empty;
+	private static string packageTreePath = string.Empty;
 
         static void Main(string[] args)
         {
@@ -26,9 +27,10 @@ namespace ExportGGPK
 
             contentPath = args[0];
             outputPath = args[1];
-            string data = "";
-            if(args.Length == 3 )
-                data = args[2];
+            if (args.Length == 3)
+	    {
+                packageTreePath = args[2];
+            }
 
             if (!File.Exists(contentPath))
             {
