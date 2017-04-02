@@ -11,7 +11,7 @@ namespace ExportGGPK
     {
         private static readonly GrindingGearsPackageContainer Container = new GrindingGearsPackageContainer();
         private static readonly Dictionary<string, List<FileRecord>> Data = new Dictionary<string, List<FileRecord>>();
-        private static readonly char[] PathSeperator = { Path.DirectorySeparatorChar };
+        private static readonly char[] PathSeparator = { Path.DirectorySeparatorChar };
 
         private static string contentPath = string.Empty;
         private static string outputPath = string.Empty;
@@ -34,15 +34,22 @@ namespace ExportGGPK
 
             if (!File.Exists(contentPath))
             {
-                Console.WriteLine(string.Format("Content pack file is not available at {0}", contentPath));
+                Console.WriteLine($"Content pack file is not available at ${contentPath}");
                 return;
             }
 
             Container.Read(contentPath, Console.WriteLine);
 
-            var gameData = GetDirectory(data);
-            var dataItems = RecursiveFindByType(gameData);
-            Console.WriteLine(string.Format("Found {0} data files!", dataItems.Count));
+            var art = GetDirectory(@"Art\2DItems");
+            var gameData = GetDirectory("Data");
+
+            var artItems = RecursiveFindByType(FileRecord.DataFormat.TextureDds, art);
+            var dataItems = RecursiveFindByType(FileRecord.DataFormat.Dat, gameData);
+
+            Console.WriteLine($"Found {artItems.Count} textures!");
+            Console.WriteLine($"Found {dataItems.Count} data files!");
+
+            Extract(artItems);
             Extract(dataItems);
         }
 
@@ -56,13 +63,12 @@ namespace ExportGGPK
 
         private static DirectoryTreeNode GetDirectory(string path)
         {
-            var dirs = path.Split(PathSeperator, StringSplitOptions.RemoveEmptyEntries);
+            var dirs = path.Split(PathSeparator, StringSplitOptions.RemoveEmptyEntries);
             var currDir = Container.DirectoryRoot;
 
             foreach (var dir in dirs)
             {
                 currDir = WalkNode(currDir, dir);
-            }
             return currDir;
         }
 
@@ -77,18 +83,23 @@ namespace ExportGGPK
             return dir == null ? new List<FileRecord>() : dir.Files;
         }
 
-        private static List<FileRecord> RecursiveFindByType(DirectoryTreeNode currentNode, List<FileRecord> roller = null)
+        public static IEnumerable<FileRecord> FilterByType(FileRecord.DataFormat format, List<FileRecord> records)
+        {
+            return records.Where((record) => record.FileFormat.Equals(format));
+        }
+
+        private static List<FileRecord> RecursiveFindByType(FileRecord.DataFormat type, DirectoryTreeNode currentNode, List<FileRecord> roller = null)
         {
             if (roller == null)
             {
                 roller = new List<FileRecord>();
             }
 
-            roller.AddRange(currentNode.Files);
+            roller.AddRange(FilterByType(type, currentNode.Files));
 
             foreach (var subDir in currentNode.Children)
             {
-                RecursiveFindByType(subDir, roller);
+                RecursiveFindByType(type, subDir, roller);
             }
 
             return roller;
