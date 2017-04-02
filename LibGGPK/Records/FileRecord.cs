@@ -27,6 +27,7 @@ namespace LibGGPK.Records
         }
 
         #region KnownFileFormats
+
         /// <summary>
         /// A quick and dirty mapping of what type of data is contained in each file type
         /// </summary>
@@ -115,18 +116,22 @@ namespace LibGGPK.Records
         /// SHA256 hash of this file's data
         /// </summary>
         public byte[] Hash;
+
         /// <summary>
         /// File name
         /// </summary>
         public string Name;
+
         /// <summary>
         /// Offset in pack file where the raw data begins
         /// </summary>
         public long DataBegin;
+
         /// <summary>
         /// Length of the raw file data
         /// </summary>
         public long DataLength;
+
         /// <summary>
         /// Directory this file resides in
         /// </summary>
@@ -148,10 +153,10 @@ namespace LibGGPK.Records
             var nameLength = br.ReadInt32();
             Hash = br.ReadBytes(32);
 
-            Name = Encoding.Unicode.GetString(br.ReadBytes(2 * (nameLength - 1)));
+            Name = Encoding.Unicode.GetString(br.ReadBytes(2*(nameLength - 1)));
             br.BaseStream.Seek(2, SeekOrigin.Current); // Null terminator
             DataBegin = br.BaseStream.Position;
-            DataLength = Length - (8 + nameLength * 2 + 32 + 4);
+            DataLength = Length - (8 + nameLength*2 + 32 + 4);
 
             br.BaseStream.Seek(DataLength, SeekOrigin.Current);
         }
@@ -167,7 +172,7 @@ namespace LibGGPK.Records
             bw.Write(Name.Length + 1);
             bw.Write(Hash);
             bw.Write(Encoding.Unicode.GetBytes(Name));
-            bw.Write((short)0);
+            bw.Write((short) 0);
 
             // IMPORTANT: FileRecord's actual file content written not here
         }
@@ -273,7 +278,7 @@ namespace LibGGPK.Records
         /// <param name="freeRecordRoot">Root of FREE records</param>
         private void MarkAsFree(FileStream ggpkFileStream, LinkedList<FreeRecord> freeRecordRoot)
         {
-            var nextFreeRecordOffset = BitConverter.GetBytes((long)0);
+            var nextFreeRecordOffset = BitConverter.GetBytes((long) 0);
             var freeRecordTag = Encoding.ASCII.GetBytes("FREE");
 
             // Mark previous data as FREE
@@ -296,7 +301,7 @@ namespace LibGGPK.Records
 
                 // Update and write new record data to end of GGPK file
                 RecordBegin = ggpkFileStream.Position;
-                Length = (uint)(Length - DataLength + replacmentData.Length);
+                Length = (uint) (Length - DataLength + replacmentData.Length);
 
                 // Generate the new Hash
                 var sha256 = SHA256Managed.Create();
