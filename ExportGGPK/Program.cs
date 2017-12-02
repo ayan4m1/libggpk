@@ -13,10 +13,9 @@ namespace ExportGGPK
         private static readonly Dictionary<string, List<FileRecord>> Data = new Dictionary<string, List<FileRecord>>();
         private static readonly char[] PathSeparator = { Path.DirectorySeparatorChar };
 
-        private static string contentPath = string.Empty;
+        private static string packagePath = string.Empty;
         private static string outputPath = string.Empty;
 	private static string packageTreePath = string.Empty;
-
         static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -25,20 +24,20 @@ namespace ExportGGPK
                 return;
             }
 
-            contentPath = args[0];
+            packagePath = args[0];
             outputPath = args[1];
             if (args.Length == 3)
 	    {
                 packageTreePath = args[2];
             }
 
-            if (!File.Exists(contentPath))
+            if (!File.Exists(packagePath))
             {
-                Console.WriteLine($"Content pack file is not available at ${contentPath}");
+                Console.WriteLine($"Content pack file is not available at ${packagePath}");
                 return;
             }
 
-            Container.Read(contentPath, Console.WriteLine);
+            Container.Read(packagePath, Console.WriteLine);
 
             var art = GetDirectory(@"Art\2DItems");
             var gameData = GetDirectory("Data");
@@ -57,7 +56,7 @@ namespace ExportGGPK
         {
             foreach (var item in items)
             {
-                item.ExtractFileWithDirectoryStructure(contentPath, outputPath);
+                item.ExtractFileWithDirectoryStructure(packagePath, outputPath);
             }
         }
 
