@@ -2,6 +2,11 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BrotliSharpLib;
+using ImageMagick;
+using LibDat;
 using LibGGPK;
 using LibGGPK.Records;
 
@@ -49,7 +54,76 @@ namespace ExportGGPK
             Console.WriteLine($"Found {dataItems.Count} data files!");
 
             Extract(artItems);
+            ConvertTextures(outputPath);
             Extract(dataItems);
+            ConvertData(outputPath);
+        }
+
+        private static void ConvertData(string path)
+        {
+            var enumerator = Directory.EnumerateFiles(path, "*.dat", SearchOption.AllDirectories);
+            Parallel.ForEach(enumerator, (record) =>
+            {
+                try
+                {
+                    var dat = new DatContainer(record);
+                    var csvData = dat.GetCsvFormat();
+                    var csvName = Path.ChangeExtension(record, ".csv");
+                    File.WriteAllText(csvName, csvData);
+                    Console.WriteLine($"Converted data file {csvName}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"Error trying to convert data file {record}");
+                }
+            });
+        }
+
+        private static void ConvertTextures(string path)
+        {
+            var enumerator = Directory.EnumerateFiles(path, "*.dds", SearchOption.AllDirectories);
+            Parallel.ForEach(enumerator, (record) =>
+            {
+                var raw = File.ReadAllBytes(record);
+                // if the data is like "*Art/2DItems/Armours/BodyArmours/DexInt3A.dds"
+                // then follow that path and update our raw binary data
+                if (raw[0] == 0x2A)
+                {
+                    var refPath = Encoding.ASCII.GetString(raw.Skip(1).Take(raw.Length - 1).ToArray());
+                    var newPath = $"{path}/ROOT/{refPath}";
+                    raw = File.ReadAllBytes(newPath);
+                }
+
+                // pull the first four bytes as the expected file length
+                var rawLength = raw.Take(4).ToArray();
+                // the integer is little endian
+                rawLength.Reverse();
+                var expectedLength = BitConverter.ToUInt32(rawLength, 0);
+                if (raw.Length - 4 != expectedLength)
+                {
+                    Console.WriteLine($"Warning, mismatch between expected length {expectedLength} and actual length {raw.Length}");
+                }
+                // now decompress the rest of the file
+                var decompressed = Brotli.DecompressBuffer(raw, 4, raw.Length - 4);
+                // check for valid header
+                if (decompressed[0] == decompressed[1] && decompressed[1] == 0x44 && decompressed[2] == 0x53 && decompressed[3] == 0x20)
+                {
+                    var newFile = Path.ChangeExtension(record, ".png");
+                    if (File.Exists(newFile))
+                    {
+                        return;
+                    }
+
+                    using (var magickImage = new MagickImage(decompressed))
+                    {
+                        magickImage.Write(newFile);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Error decompressing texture {record}");
+                }
+            });
         }
 
         private static void Extract(IEnumerable<FileRecord> items)
