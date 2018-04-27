@@ -296,7 +296,7 @@ namespace LibGGPK
             FileStream readStream;
             FileStream writeStream;
             using (readStream = File.OpenRead(_pathToGppk))
-            using (writeStream = File.Open(pathToGgpkNew, FileMode.Truncate, FileAccess.ReadWrite))
+            using (writeStream = File.Open(pathToGgpkNew, FileMode.Create, FileAccess.ReadWrite))
             {
                 var reader = new BinaryReader(readStream);
                 var writer = new BinaryWriter(writeStream);
