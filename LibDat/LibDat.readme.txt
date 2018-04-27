@@ -91,13 +91,13 @@ This is readme is written to better understand how to work with .dat files in GG
     - ""type" = type of field
 
 3) "type" attribute.
-It's pattern is "((list|ref)\|)*(bool|byte|short|int|uint|long|ulong|string)" 
+Its pattern is "((list|ref)\|)*(bool|byte|short|int|uint|long|ulong|string)" 
 For those who don't know regular expressions (and you only want to change XML) it means that string consists of:
     at the start: zero or more concatenated strings "list|" or "ref|"
     followed by one string of list: bool byte short int uint long ulong string
 In this scenario list and ref are complex types, and bool byte short int uint long ulong string are simple types.
 
-What each type means?
+What does each type mean?
     - ref:      data contains offset to another data. All offsets are calculated from start of data section
                 First offset is always 8.
     - list:     data is pointer to another data.
@@ -113,6 +113,7 @@ Examples:
                         second 4 bytes contain offset to where list begins
 5) ref|ref|string       pointer to pointer to string
 6) ref|list|ref|string  pointer to list of pointers to string
+
 And so on.
 
 ###########################
@@ -165,15 +166,15 @@ AbstractData derived classes
 !!! Everything in the .dat file is "Data" !!!
 
 Every Field contains "Data"
-Field's Data differs from Data in data section for this reasons:
-    - it's has negative Offset
+Field Data differs from Data in data section for this reasons:
+    - it has negative Offset
     - it can contain only fixed size ValueData and PointerData
 
 ##########################
 FAQ
 ###########################
 
-X. How to create new type?
+X. How do I create a new type?
 1) create new DataType derived type or use existing
 2) create new AbstractData derived class or use existing
 3) link them through TypeFactory.CreateData( ... ) method
