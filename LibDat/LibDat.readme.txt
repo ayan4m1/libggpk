@@ -148,7 +148,7 @@ DatContainer
 ###########################
 Main class for parsing .dat files
 
-It's functions:
+Its functions:
 - entry point for parsing  .dat files
 - store parsed records and data section data
 - change data section contents
