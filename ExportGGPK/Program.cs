@@ -20,7 +20,8 @@ namespace ExportGGPK
 
         private static string packagePath = string.Empty;
         private static string outputPath = string.Empty;
-	private static string packageTreePath = string.Empty;
+	    private static string packageTreePath = string.Empty;
+
         static void Main(string[] args)
         {
             if (args.Length < 2)
@@ -142,6 +143,8 @@ namespace ExportGGPK
             foreach (var dir in dirs)
             {
                 currDir = WalkNode(currDir, dir);
+            }
+
             return currDir;
         }
 
