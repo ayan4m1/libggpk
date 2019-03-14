@@ -3306,7 +3306,7 @@
 		</record>
 		<record file="StatSemantics" length="0">
 		</record>
-		<record file="Stats" length="48">
+		<record file="Stats" length="49">
 			<field id="Id" type="ref|string"/>
 			<field id="Flag0" type="bool"/>
 			<field id="IsLocal" type="bool"/>
@@ -3323,6 +3323,7 @@
 			<field id="Unknown2" type="ref|list|int"/>
 			<field id="Key0" type="ulong"/>
 			<field id="Flag8" type="byte"/>
+			<field id="Flag9" type="bool"/>
 		</record>
 		<record file="StrDexIntMissionExtraRequirement" length="60">
 			<field id="Id" type="ref|string"/>
