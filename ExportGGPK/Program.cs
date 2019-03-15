@@ -75,7 +75,9 @@ namespace ExportGGPK
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine($"Error trying to convert data file {record}");
+                    Console.WriteLine($"Error trying to convert data file {record}!");
+                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.StackTrace);
                 }
             });
         }
